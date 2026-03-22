@@ -13,6 +13,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
         .message = "Starting...",
         .style = opts.style,
         .delay = opts.delay,
+        .direction = opts.direction,
     });
     try spinner.start();
     defer spinner.finish();
@@ -31,6 +32,7 @@ pub fn main(init: std.process.Init.Minimal) !void {
 const Options = struct {
     style: []const []const u8 = styles.braille,
     delay: std.Io.Duration = .fromMilliseconds(80),
+    direction: Spinner.Direction = .forward,
 };
 
 fn parseArgs(args: std.process.Args) ?Options {
@@ -38,7 +40,9 @@ fn parseArgs(args: std.process.Args) ?Options {
     var iter = args.iterate();
     _ = iter.next(); // skip program name
     while (iter.next()) |arg| {
-        if (std.mem.eql(u8, arg, "-s") or std.mem.eql(u8, arg, "--style")) {
+        if (std.mem.eql(u8, arg, "-r") or std.mem.eql(u8, arg, "--reverse")) {
+            opts.direction = .reverse;
+        } else if (std.mem.eql(u8, arg, "-s") or std.mem.eql(u8, arg, "--style")) {
             const name = iter.next() orelse {
                 std.debug.print("error: --style requires a value\n", .{});
                 return null;
@@ -87,6 +91,7 @@ fn printUsage() void {
         \\Options:
         \\  -s, --style <name>  Set the spinner style (default: braille)
         \\  -d, --delay <ms>    Set the frame delay in milliseconds (default: 80)
+        \\  -r, --reverse       Reverse the spinner direction
         \\  --list-styles       List all available styles
         \\  -h, --help          Show this help message
         \\
