@@ -69,6 +69,10 @@ pub fn reverse(self: *Spinner) void {
     self.direction = if (self.direction == .forward) .reverse else .forward;
 }
 
+pub fn speed(self: *Spinner, delay: Duration) void {
+    self.delay = delay;
+}
+
 const std = @import("std");
 const Io = std.Io;
 const Future = Io.Future;
