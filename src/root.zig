@@ -1,4 +1,5 @@
-const Spinner = @This();
+pub const Spinner = @This();
+pub const styles = @import("styles.zig");
 
 const clear = "\r\x1b[2K";
 const delay: Duration = .fromMilliseconds(80);
@@ -7,18 +8,18 @@ io: Io,
 message: []const u8,
 stop: std.atomic.Value(bool) = .init(false),
 future: Future(void) = undefined,
-frames: []const []const u8,
+style: []const []const u8,
 
 pub const Config = struct {
     message: []const u8,
-    frames: []const []const u8 = @import("frames.zig").braile,
+    style: []const []const u8 = styles.braile,
 };
 
 pub fn init(io: Io, config: Config) Spinner {
     return Spinner{
         .io = io,
         .message = config.message,
-        .frames = config.frames,
+        .style = config.style,
     };
 }
 
@@ -45,9 +46,9 @@ fn run(self: *Spinner) void {
     var w = stderr.writer(self.io, &buf);
     var i: usize = 0;
     while (!self.stop.load(.acquire)) {
-        w.interface.print(clear ++ "{s} {s}", .{ self.frames[i], self.message }) catch return;
+        w.interface.print(clear ++ "{s} {s}", .{ self.style[i], self.message }) catch return;
         w.interface.flush() catch return;
-        i = (i + 1) % self.frames.len;
+        i = (i + 1) % self.style.len;
         self.io.sleep(delay, .awake) catch {};
     }
 }

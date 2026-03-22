@@ -16,7 +16,7 @@ pub fn main() !void {
     try io.sleep(.fromSeconds(1), .awake);
 
     for (0..5) |i| {
-        spinner.message = try std.fmt.bufPrint(&buf, "Spinning ({d})...", .{5 - i});
+        spinner.message = try std.fmt.bufPrint(&buf, "Reticulating splines ({d})...", .{5 - i});
         try io.sleep(.fromSeconds(1), .awake);
     }
 
