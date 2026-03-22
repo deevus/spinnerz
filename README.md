@@ -21,11 +21,10 @@ defer spinner.finish();
 // Do work...
 spinner.message = "Almost done...";
 
-// Change speed at runtime
-spinner.speed(.fromMilliseconds(50));
-
-// Reverse direction
-spinner.reverse();
+// Change speed or direction at runtime
+spinner.delay = .fromMilliseconds(50);
+spinner.direction = .reverse;
+spinner.reverse(); // or toggle with reverse()
 ```
 
 Only `message` is required -- `style`, `delay`, and `direction` have defaults (`braille`, `80ms`, `.forward`).
