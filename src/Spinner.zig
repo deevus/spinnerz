@@ -9,7 +9,7 @@ pub const Direction = enum { forward, reverse };
 io: Io,
 message: []const u8,
 stop: std.atomic.Value(bool) = .init(false),
-future: Future(void) = undefined,
+future: ?Future(void) = null,
 style: []const []const u8,
 delay: Duration,
 direction: Direction,
@@ -38,8 +38,11 @@ pub fn start(self: *Spinner) !void {
 
 pub fn finish(self: *Spinner) void {
     self.stop.store(true, .release);
-    self.future.cancel(self.io);
-    _ = self.future.await(self.io);
+
+    if (self.future) |*future| {
+        future.cancel(self.io);
+        _ = future.await(self.io);
+    }
 
     const stderr = File.stderr();
     var buf: [256]u8 = undefined;
