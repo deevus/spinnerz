@@ -5,13 +5,14 @@ pub fn main(init: std.process.Init.Minimal) !void {
     defer threaded.deinit();
     const io = threaded.io();
 
-    const style = parseArgs(init.args) orelse std.process.exit(1);
+    const opts = parseArgs(init.args) orelse std.process.exit(1);
 
     var buf: [64]u8 = undefined;
 
     var spinner: Spinner = .init(io, .{
         .message = "Starting...",
-        .style = style,
+        .style = opts.style,
+        .delay = opts.delay,
     });
     try spinner.start();
     defer spinner.finish();
@@ -27,7 +28,13 @@ pub fn main(init: std.process.Init.Minimal) !void {
     try io.sleep(.fromSeconds(1), .awake);
 }
 
-fn parseArgs(args: std.process.Args) ?[]const []const u8 {
+const Options = struct {
+    style: []const []const u8 = styles.braille,
+    delay: std.Io.Duration = .fromMilliseconds(80),
+};
+
+fn parseArgs(args: std.process.Args) ?Options {
+    var opts: Options = .{};
     var iter = args.iterate();
     _ = iter.next(); // skip program name
     while (iter.next()) |arg| {
@@ -36,11 +43,21 @@ fn parseArgs(args: std.process.Args) ?[]const []const u8 {
                 std.debug.print("error: --style requires a value\n", .{});
                 return null;
             };
-            return lookupStyle(name) orelse {
+            opts.style = lookupStyle(name) orelse {
                 std.debug.print("error: unknown style '{s}'\navailable styles:\n", .{name});
                 printStyles();
                 return null;
             };
+        } else if (std.mem.eql(u8, arg, "-d") or std.mem.eql(u8, arg, "--delay")) {
+            const val = iter.next() orelse {
+                std.debug.print("error: --delay requires a value in ms\n", .{});
+                return null;
+            };
+            const ms = std.fmt.parseInt(i64, val, 10) catch {
+                std.debug.print("error: invalid delay '{s}', expected milliseconds\n", .{val});
+                return null;
+            };
+            opts.delay = .fromMilliseconds(ms);
         } else if (std.mem.eql(u8, arg, "--list-styles")) {
             printStyles();
             std.process.exit(0);
@@ -49,7 +66,7 @@ fn parseArgs(args: std.process.Args) ?[]const []const u8 {
             std.process.exit(0);
         }
     }
-    return styles.braille;
+    return opts;
 }
 
 fn lookupStyle(name: []const u8) ?[]const []const u8 {
@@ -69,6 +86,7 @@ fn printUsage() void {
         \\
         \\Options:
         \\  -s, --style <name>  Set the spinner style (default: braille)
+        \\  -d, --delay <ms>    Set the frame delay in milliseconds (default: 80)
         \\  --list-styles       List all available styles
         \\  -h, --help          Show this help message
         \\

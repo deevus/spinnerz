@@ -52,7 +52,7 @@ fn run(self: *Spinner) void {
         w.interface.print(clear ++ "{s} {s}", .{ self.style[i], self.message }) catch return;
         w.interface.flush() catch return;
         i = (i + 1) % self.style.len;
-        self.io.sleep(default_delay, .awake) catch {};
+        self.io.sleep(self.delay, .awake) catch {};
     }
 }
 
