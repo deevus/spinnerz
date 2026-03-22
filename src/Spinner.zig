@@ -2,17 +2,19 @@ const Spinner = @This();
 const styles = @import("styles.zig");
 
 const clear = "\r\x1b[2K";
-const delay: Duration = .fromMilliseconds(80);
+const default_delay: Duration = .fromMilliseconds(80);
 
 io: Io,
 message: []const u8,
 stop: std.atomic.Value(bool) = .init(false),
 future: Future(void) = undefined,
 style: []const []const u8,
+delay: Duration,
 
 pub const Config = struct {
     message: []const u8,
     style: []const []const u8 = styles.braille,
+    delay: Duration = default_delay,
 };
 
 pub fn init(io: Io, config: Config) Spinner {
@@ -20,6 +22,7 @@ pub fn init(io: Io, config: Config) Spinner {
         .io = io,
         .message = config.message,
         .style = config.style,
+        .delay = config.delay,
     };
 }
 
@@ -49,7 +52,7 @@ fn run(self: *Spinner) void {
         w.interface.print(clear ++ "{s} {s}", .{ self.style[i], self.message }) catch return;
         w.interface.flush() catch return;
         i = (i + 1) % self.style.len;
-        self.io.sleep(delay, .awake) catch {};
+        self.io.sleep(default_delay, .awake) catch {};
     }
 }
 
