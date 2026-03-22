@@ -7,7 +7,9 @@ pub fn main() !void {
 
     var buf: [64]u8 = undefined;
 
-    var spinner: Spinner = .init(io, "Starting...");
+    var spinner: Spinner = .init(io, .{
+        .message = "Starting...",
+    });
     try spinner.start();
     defer spinner.finish();
 
