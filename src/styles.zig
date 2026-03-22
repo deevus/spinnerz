@@ -86,7 +86,6 @@ pub const square_fill_2: Style = &.{ "□", "◱", "▨", "▩", "■" };
 pub const shade_fill: Style = &.{ "░", "▒", "▓", "█" };
 pub const shade_toggle: Style = &.{ "░", "█" };
 pub const circle_toggle: Style = &.{ "⚪", "⚫" };
-pub const circle_fill: Style = &.{ "◯", "⬤" };
 pub const bar_toggle_thin: Style = &.{ "▱", "▰" };
 pub const numbers: Style = &genRange(0x278A, 10);
 pub const fractions: Style = &.{ "½", "⅓", "⅔", "¼", "¾", "⅛", "⅜", "⅝", "⅞" };
