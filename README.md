@@ -1,27 +1,56 @@
 # spinnerz
 
-A terminal spinner library for Zig.
+A configurable terminal spinner library for Zig with many built-in styles.
 
 ## Usage
 
 ```zig
-const Spinner = @import("spinnerz");
+const spinnerz = @import("spinnerz");
+const Spinner = spinnerz.Spinner;
+const styles = spinnerz.styles;
 
-var spinner: Spinner = .init(io, "Loading...");
+var spinner = Spinner.init(io, .{
+    .message = "Loading...",
+    .style = styles.dots_spread,
+    .delay = .fromMilliseconds(100),
+    .direction = .forward,
+});
 try spinner.start();
 defer spinner.finish();
 
 // Do work...
 spinner.message = "Almost done...";
+
+// Change speed at runtime
+spinner.speed(.fromMilliseconds(50));
+
+// Reverse direction
+spinner.reverse();
+```
+
+Only `message` is required -- `style`, `delay`, and `direction` have defaults (`braille`, `80ms`, `.forward`).
+
+## Demo
+
+```sh
+zig build                                          # build everything
+./zig-out/bin/spinnerz-demo                        # default braille spinner
+./zig-out/bin/spinnerz-demo --style dots_spread    # pick a style
+./zig-out/bin/spinnerz-demo --delay 50             # faster
+./zig-out/bin/spinnerz-demo --reverse              # reverse direction
+./zig-out/bin/spinnerz-demo --list-styles          # show all available styles
 ```
 
 ## Building
 
 ```sh
-zig build          # Build the library
-zig build run      # Run the demo
+zig build
 ```
 
 ## Requirements
 
 Zig 0.16.x
+
+## License
+
+MIT
